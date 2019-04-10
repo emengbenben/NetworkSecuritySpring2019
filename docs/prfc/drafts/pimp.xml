@@ -403,20 +403,16 @@ PIMP A                                                       PIMP B
         </figure>
    
    </section>
-   <section title="PETF FIX ME">
+   <section title="PETF Initial Fix for Connection Close">
 	   <t>	   
-		 The reciever of the FIN packet will send a FIN-ACK. Upon reciept of the FIN-ACK, the reciever
-			 of the FIN-ACK will wait for any outstanding data (missing sequence numbers) from the sender of
-			 the FIN. The reciever of the FIN-ACK will also wait until any un-ACKed packets they have sent to
-			 be ACKed and then one last ACK will be sent. The reciver of the FIN ACK will send the ACK and then close
-			 (after sending and recieving any previous SEQs and ACKs). 
-			 The sender of the FIN ACK will wait for the last ACK. 
-			 If it doesn't recieve the ACK within the timeout period, but gotten ACKs for all
-			 data sent and doesn't have any un-ACKed data, it will close anyway.
-			 The sequence number and ack number in FIN, FIN-ACK and the final ACK should be the next numbers in the regular sequence.
-			 These will NOT be seperate ACK packets. The FIN will contain the sequence number and the ACK number will be set to zero.
-			 The FIN-ACK will contain the sender's sequence number AND ACK for the FIN. The final ACK will contain the sequence number
-			 and ACK number for the FIN-ACK.
+	      PIMP A and PIMP B are in the established state and PIMP A want to close the connection (i.e., PIMP A doesn’t have any new data to send). 
+              PIMP A will send a FIN packet and go into the CLOSING state (i.e.,  not accepting any more data). 
+              Once PIMP B receives the FIN packet, it will check for any outstanding data. 
+              When PIMP B receives these data, it will (1) send a connection lost to the application layer, (2) send a FIN-ACK packet to PIMP A,  (3) go into the CLOSING state, and (4) start the 3-sec timer for the ACK before connection close. 
+              When PIMP A receives the FIN-ACK packet from PIMP B, it will send an ACK and close its connection. When PIMP B receives the ACK packet from PIMP A or if the time expires, PIMP B will close its connection.
+                   
+              If PIMP A and PIMP B send the FIN packet to each other at the same time, PIMP A and PIMP B will both go into the CLOSING state and wait to receives the FIN Packet from each other.
+              Once the FIN packet is received, it will send an ACK packet back and close the connection. 
 		 </t>
 	 </section>
 <section title="ACK Specification">
